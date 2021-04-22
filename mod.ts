@@ -14,7 +14,7 @@ function makeDefaultProperty(obj: objectType, name: string, callBack: (val: unkn
 export function decorateAccessors(obj: objectType, callBack: (val: unknown, obj?: objectType)=>void){
     Object.entries(obj).forEach(([key, val])=>{
         if(typeof val === "object"){
-            decorateAccessors(val as any, callBack);
+            decorateAccessors(val as objectType, callBack);
         }
         makeDefaultProperty(obj, key, callBack); // NOTE: obj here needs to be the scope that the key is in..
     });
