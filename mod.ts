@@ -1,4 +1,5 @@
-function makeDefaultProperty(obj: Record<string, unknown>, name: string, callBack: (val: unknown, obj: Record<string, unknown>)=>void) {
+type objectType = Record<string, unknown>;
+function makeDefaultProperty(obj: objectType, name: string, callBack: (val: unknown, obj: objectType)=>void) {
     let value = obj[name];
     return Object.defineProperty(obj, name, {
       set: function (val) {
@@ -10,7 +11,7 @@ function makeDefaultProperty(obj: Record<string, unknown>, name: string, callBac
       }
     });
 }
-export function decorateAccessors(obj: Record<string, unknown>, callBack: (val: unknown, obj?: Record<string, unknown>)=>void){
+export function decorateAccessors(obj: objectType, callBack: (val: unknown, obj?: objectType)=>void){
     Object.entries(obj).forEach(([key, val])=>{
         if(typeof val === "object"){
             decorateAccessors(val as any, callBack);
