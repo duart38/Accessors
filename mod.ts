@@ -1,16 +1,16 @@
-function makeDefaultProperty(obj: Record<string, unknown>, name: string, callBack: (val: unknown)=>void) {
+function makeDefaultProperty(obj: Record<string, unknown>, name: string, callBack: (val: unknown, obj: Record<string, unknown>)=>void) {
     let value = obj[name];
     return Object.defineProperty(obj, name, {
       set: function (val) {
         value = val;
-        callBack(value);
+        callBack(value, obj);
       },
       get: function () {
         return value;
       }
     });
-};
-export function decorateAccessors(obj: Record<string, unknown>, callBack: (val: unknown)=>void){
+}
+export function decorateAccessors(obj: Record<string, unknown>, callBack: (val: unknown, obj?: Record<string, unknown>)=>void){
     Object.entries(obj).forEach(([key, val])=>{
         if(typeof val === "object"){
             decorateAccessors(val as any, callBack);
