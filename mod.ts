@@ -1,21 +1,17 @@
-type objectType = Record<string, unknown>;
-function makeDefaultProperty(obj: objectType, name: string, callBack: (val: unknown, obj: objectType)=>void) {
-    let value = obj[name];
-    return Object.defineProperty(obj, name, {
-      set: function (val) {
-        value = val;
-        callBack(value, obj);
-      },
-      get: function () {
-        return value;
-      }
-    });
-}
-export function decorateAccessors(obj: objectType, callBack: (val: unknown, obj?: objectType)=>void){
-    Object.entries(obj).forEach(([key, val])=>{
-        if(typeof val === "object"){
-            decorateAccessors(val as objectType, callBack);
-        }
-        makeDefaultProperty(obj, key, callBack); // NOTE: obj here needs to be the scope that the key is in..
-    });
+export function decorateAccessors<T extends Record<string, unknown>>(
+  obj: T,
+  callBack: (val: unknown) => void,
+) {
+  Object.entries(obj).forEach(([key, val]) => {
+    if (typeof val === "object") {
+      (obj[key] as unknown) = decorateAccessors(val as any, callBack);
+    }
+  });
+  return new Proxy(obj, {
+    set: (obj, modifiedKey, value) => {
+      Reflect.set(obj, modifiedKey, value);
+      callBack(value);
+      return true;
+    },
+  });
 }
