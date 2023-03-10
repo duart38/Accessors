@@ -17,18 +17,24 @@
 
 export function decorateAccessors<T extends Record<string, unknown>>(
   obj: T,
-  callBack: (val: unknown) => void,
+  getCallBack: (key: string | symbol) => void,
+  setCallBack: (key: string | symbol, val: unknown) => void,
 ) {
   Object.entries(obj).forEach(([key, val]) => {
     if (typeof val === "object") {
-      (obj[key] as unknown) = decorateAccessors(val as any, callBack);
+      (obj[key] as unknown) = decorateAccessors(val as any, getCallBack, setCallBack);
     }
   });
   return new Proxy(obj, {
-    set: (obj, modifiedKey, value) => {
-      Reflect.set(obj, modifiedKey, value);
-      callBack(value);
+    set: (obj, key, value) => {
+      Reflect.set(obj, key, value);
+      setCallBack(key, value);
       return true;
     },
+    get: (target, key, receiver) => {
+      const value = Reflect.get(target, key, receiver);
+      getCallBack(key);
+      return value;
+    }
   });
 }
